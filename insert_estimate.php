@@ -8,10 +8,10 @@ $id = isset($_GET['id']) ? $_GET['id'] : "";
 <head>
   <meta charset="utf-8">
   <title>見積書作成</title>
-  <link rel="stylesheet" type="text/css" href="../css/reset.css?<?= date('His') ?>">
-  <link rel="stylesheet" type="text/css" href="../css/common.css?<?= date('His') ?>">
+  <link rel="stylesheet" type="text/css" href="css/reset.css?<?= date('His') ?>">
+  <link rel="stylesheet" type="text/css" href="css/common.css?<?= date('His') ?>">
   <link href="https://fonts.googleapis.com/css?family=Noto+Sans+JP" rel="stylesheet">		
-  <link rel="stylesheet" href="../css/estimate_order.css?=<?= date('YmdHis') ?>">
+  <link rel="stylesheet" href="css/estimate_order.css?=<?= date('YmdHis') ?>">
   <style>
     .container {
       min-height: 500px;
@@ -23,7 +23,7 @@ $id = isset($_GET['id']) ? $_GET['id'] : "";
   <main>
     <div class="container" id="app" :class="{'noscroll': is_modal}">
       <template v-if="mode === 1">
-        <h2 class="page_title"><img src="../img/title_product_search.svg" style="width: 250px;"></h2>
+        <h2 class="page_title"><img src="img/title_product_search.svg" style="width: 250px;"></h2>
         <section class="flexible top_section">
           <div class="search_area">
             <label><input type="text" placeholder="型番で検索" v-model="searchWord"></label>
@@ -944,19 +944,19 @@ $id = isset($_GET['id']) ? $_GET['id'] : "";
           let action = act;
           switch (action) {
             case 'insert':
-              this.page_tit = '<img src="../img/title_create_new_estimate.svg" style="width: 250px;">';
+              this.page_tit = '<img src="img/title_create_new_estimate.svg" style="width: 250px;">';
               this.btn_label = '見積書作成';
               this.result_dsp_tit = '見積書を作成しました。';
               this.result_dsp_desc = '見積書の新規作成に成功しました。作成した見積書のIDは「' + this.estimate_id + '」です。<br>見積書一覧ページからもPDFをダウンロード出来ます。<br>発注に進む場合は「発注ボタン」を押してください。';
               break;
             case 'update':
-              this.page_tit = '<img src="../img/title_update_estimate.svg" style="width: 250px;">';
+              this.page_tit = '<img src="img/title_update_estimate.svg" style="width: 250px;">';
               this.btn_label = '見積書更新';
               this.result_dsp_tit = '見積書の内容を更新しました。';
               this.result_dsp_desc = '見積書の更新に成功しました。<br>見積書一覧ページからもPDFをダウンロード出来ます。<br>発注に進む場合は「発注ボタン」を押してください。';
               break;
             case 'copy':
-              this.page_tit = '<img src="../img/title_copy_estimate.svg" style="width: 250px;">';
+              this.page_tit = '<img src="img/title_copy_estimate.svg" style="width: 250px;">';
               this.btn_label = '見積書登録';
               this.result_dsp_tit = '見積書を登録しました。';
               this.result_dsp_desc = '見積書を複製し、内容をもとに新規登録しました。見積書IDは' + this.estimate_id + 'です。<br>見積書一覧ページからもPDFをダウンロード出来ます。<br>発注に進む場合は「発注ボタン」を押してください。';
