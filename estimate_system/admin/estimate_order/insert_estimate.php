@@ -1,0 +1,1145 @@
+<?php
+$action = isset($_GET['action']) ? $_GET['action'] : "";
+$id = isset($_GET['id']) ? $_GET['id'] : "";
+?>
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+  <title>見積書作成</title>
+  <link rel="stylesheet" type="text/css" href="../css/reset.css?<?= date('His') ?>">
+  <link rel="stylesheet" type="text/css" href="../css/common.css?<?= date('His') ?>">
+  <link href="https://fonts.googleapis.com/css?family=Noto+Sans+JP" rel="stylesheet">		
+  <link rel="stylesheet" href="../css/estimate_order.css?=<?= date('YmdHis') ?>">
+  <style>
+    .container {
+      min-height: 500px;
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <div class="container" id="app" :class="{'noscroll': is_modal}">
+      <template v-if="mode === 1">
+        <h2 class="page_title"><img src="../img/title_product_search.svg" style="width: 250px;"></h2>
+        <section class="flexible top_section">
+          <div class="search_area">
+            <label><input type="text" placeholder="型番で検索" v-model="searchWord"></label>
+          </div>
+        </section>
+        <section>
+          <div class="result_area">
+            <div class="result_area_list overscroll">
+              <dl v-for="p in view_products">
+                <dd class="p_number">{{ p.number }} {{ p.name }}</dd>
+								<dd class="p_stock icon_area" @click="stockModalOn(p.product_id,p.number)" title="在庫状況"><span v-html="svg_properties.stock"></span></dd>
+                <dd class="p_quant">
+                  <p>数量 <span><input type="text" name="quant" value="1"></span></p>　
+                </dd>
+                <dd class="btn_area layout_2">
+                  <button class="btn btn_2" @click="openModal($event,p.product_id)">カートに追加</button>
+                </dd>
+              </dl>
+              <dl v-if="view_products.length === 0">
+                <dd>該当する製品がありませんでした。</dd>
+              </dl>
+            </div>
+          </div>
+        </section>
+
+        <section v-if="cart.length > 0">
+          <div class="result_area_list cart_area">
+            <h3>現在のカートの内容</h3>
+            <!--<div class="btn_area"><button class="btn btn_5">カートを空にする</button></div>-->
+            <dl v-for="(c,index) in cart">
+              <dd class="p_number">{{ c.name }}</dd>
+              <dd class="p_price">単価　<input type="text" v-model="c.price"></dd>
+              <dd class="p_quant">数量　<span><input type="text" v-model="c.quant"></span></dd>
+              <dd class="btn_area"><button class="btn btn_2" @click="deleteCartOnce(index)">削除</button></dd>
+            </dl>
+          </div>
+          <div class="btn_area center">
+            <button class="btn btn_1"><a href="index.php">一覧に戻る</a></button>
+            <button class="btn btn_1" @click="mode = 2">詳細設定へ</button>
+          </div>
+        </section>
+        <div class="modal_back" v-if="is_modal || is_modal2" @click="frontModalOff">
+          <div class="modal" v-if="is_modal">
+            <p>ウェイトを選択してください。</p>
+            <div class="btn_area">
+              <button class="btn btn_3" :class="{'active': selectWeights.includes(m)}" v-for="m in modal_weights" @click="clickWeights(m)">{{ m }}</button>
+              <button class="btn btn_3 hide" v-for="n of balanceNum"></button>
+              <div class="commit_btn">
+                <label :class="{'active': allSelect}"><input type="radio" @click="allPriceAddOrDel">すべての製品にチェック</label>
+                <button class="btn btn_4" @click="addCart">カートに追加</button>
+              </div>
+            </div>
+            <button class="btn btn_close" @click="closeModal">✕</button>
+          </div>
+          <transition name="modal2">
+            <div class="modal_child" v-if="is_modal2">
+							<p class="stock_title">{{ stockNumber }} の在庫状況</p>
+              <div class="loader_est" v-if="is_modal_loading">Loading...</div>
+              <div v-for="vs in view_stocks" class="mc_child" v-else>
+                <template v-for="(s,index) in vs">
+                  <template v-if="index === 0">
+                    <h4>{{ s.weight }}</h4>
+                    <dl class="top">
+                      <dt>製品CD</dt>
+                      <dt>カラー</dt>
+                      <dt>在庫</dt>
+                    </dl>
+                  </template>
+                  <dl>
+                    <dd>{{ s.bo_id }}</dd>
+                    <dd>{{ s.color_en }}</dd>
+                    <dd>
+                      <span v-if="s.stock === 1">〇</span>
+                      <span v-else>✕</span>
+                    </dd>
+                  </dl>
+                </template>
+              </div>
+              <button class="btn btn_close" @click="stockModalOff">✕</button>
+            </div>
+          </transition>
+        </div>
+      </template>
+      <template v-if="mode === 2">
+        <h2 class="page_title" v-html="page_tit"></h2>
+        <section class="top_section">
+          <div class="info_area">
+            <dl>
+              <dt>名前/会社名<span>※必須</span></dt>
+              <dd>
+                <input type="text" class="text_long" v-model="customer" placeholder="フィットネス太郎">
+                <select v-model="honor">
+                  <option value="御中">御中</option>
+                  <option value="様">様</option>
+                </select>
+              </dd>
+            </dl>
+
+            <dl>
+              <dt>案件名<span>※必須</span></dt>
+              <dd>
+                <input type="text" class="text_long" v-model="title" placeholder="フィットネス機器の導入">
+              </dd>
+            </dl>
+
+            <dl>
+              <dt>納期<span>※必須</span></dt>
+              <dd><input type="text" class="text_long" v-model="delivery" placeholder="未定"></dd>
+            </dl>
+
+            <dl>
+              <dt>支払条件<span>※必須</span></dt>
+              <dd>
+                <input type="text" v-model="terms" class="text_long" placeholder="前金入金（1ヶ月）">
+              </dd>
+            </dl>
+
+            <dl>
+              <dt>納入場所<span>※必須</span></dt>
+              <dd><input type="text" class="text_long" v-model="address" placeholder="福岡県福岡市博多区博多駅前5-5-5"></dd>
+            </dl>
+
+            <dl>
+              <dt>有効期限<span>※必須</span></dt>
+              <dd><input type="text" v-model="deadline" placeholder="1ヶ月"></dd>
+            </dl>
+
+            <dl>
+              <dt>担当者<span>※必須</span></dt>
+              <dd>
+                <select v-model="management">
+                  <option :value="e.name" v-for="e in employee_template">{{ e.name }}</option>
+                </select>
+              </dd>
+            </dl>
+
+            <dl>
+              <dt>掛け率一括設定</dt>
+              <dd>
+                <select v-model="ratio" @change="changeRatio">
+                  <option value="1">未設定</option>
+                  <option value="0.95">5%OFF</option>
+                  <option value="0.9">10%OFF</option>
+                  <option value="0.85">15%OFF</option>
+                  <option value="0.8">20%OFF</option>
+                  <option value="0.75">25%OFF</option>
+                  <option value="0.7">30%OFF</option>
+                </select>
+                <p>※掛け率はフリー入力項目には影響しません。</p>
+              </dd>
+            </dl>
+
+          </div>
+        </section>
+
+        <section>
+          <div class="cart_contents">
+            <dl class="cart_head">
+              <dt class="cart_short"><span>No.</span></dt>
+              <dt class="cart_long"><span>製品番号</span></dt>
+              <dt class="cart_short"><span>数量</span></dt>
+              <dt class="cart_mid"><span>単価</span></dt>
+              <dt class="cart_mid"><span>金額</span></dt>
+              <dt class="cart_long"><span>備考</span></dt>
+              <dt class="cart_mini"><span>削除</span></dt>
+            </dl>
+
+            <draggable tag="div" @start="dragStart " @update="dragUpdate" @end="dragEnd">
+              <dl v-for="(c,index) in cart" :key="c.code">
+                <dd class="cart_short"><span>{{ c.order_num  }}</span></dd>
+                <!--製品データのとき-->
+                <template v-if="c.type === 0">
+                  <dd class="cart_long ver3">
+                    <span>{{ c.name }}</span>
+                    <div class="ratio_label" v-if="c.ratio_label"><span>{{ c.ratio_label }}％OFF</span></div>
+                  </dd>
+                  <dd class="cart_short"><span><input type="text" v-model="c.quant"></span></dd>
+                  <dd class="cart_mid">
+                    <span class="align_right">
+                      <input type="text" v-model="c.price" @input="labelOff(c.code)">
+                    </span>
+                  </dd>
+                  <dd class="cart_mid"><span class="align_right">{{ c.price * c.quant  | numberFormat | moneyDelimiter}}</span></dd>
+                  <dd class="cart_long"><span><textarea v-model="c.remarks"></textarea></span></dd>
+                </template>
+                <!--フリー入力欄のとき-->
+                <template v-else-if="c.type === 1">
+                  <dd class="cart_long"><span><input type="text" v-model="c.name"></span></dd>
+                  <dd class="cart_short"><span><input type="text" v-model="c.quant"></span></dd>
+                  <dd class="cart_mid">
+                    <span class="align_right">
+                      <input type="text" v-model="c.price" @input="labelOff(c.code)">
+                    </span>
+                  </dd>
+                  <dd class="cart_mid"><span class="align_right">{{ c.price * c.quant  | numberFormat | moneyDelimiter}}</span></dd>
+                  <dd class="cart_long"><span><textarea v-model="c.remarks"></textarea></span></dd>
+                </template>
+                <!--摘要のとき-->
+                <template v-else-if="c.type === 2">
+                  <dd class="cart_long"><span><input type="text" v-model="c.name"></span></dd>
+                  <dd class="cart_short"><span>{{ c.quant }}</span></dd>
+                  <dd class="cart_mid"></dd>
+                  <dd class="cart_mid"></dd>
+                  <dd class="cart_long"></dd>
+                </template>
+
+                <dd class="cart_mini">
+                  <div class="btn_area"><button class="btn btn_2" @click="deleteCartOnce(index)">✕</button></div>
+                </dd>
+              </dl>
+            </draggable>
+
+
+            <div class="btn_area">
+              <button class="btn btn_2" @click="addCartBlank">項目を追加する</button>
+              <button class="btn btn_2" @click="addCartDescription">摘要を追加する</button>
+            </div>
+            <div class="total_area">
+              <dl>
+                <dt>小計</dt>
+                <dd><span>{{ subtotal_price | numberFormat | moneyDelimiter }}円</span></dd>
+              </dl>
+              <dl>
+                <dt>消費税</dt>
+                <dd><span>{{ subtotal_price * (tax_rate - 1) | numberFormat | moneyDelimiter }}円</span></dd>
+              </dl>
+              <dl>
+                <dt>合計</dt>
+                <dd><span>{{ subtotal_price * tax_rate | numberFormat | moneyDelimiter }}円</span></dd>
+              </dl>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div class="outline_contents">
+            <p>【 備考 】{{ outline_template.template_default }}</p>
+            <div class="outline_contents_child">
+              <div class="outline_template btn_area">
+                <button class="btn btn_6" @click="template_write('template_delivery_1')">配送：佐川急便</button>
+                <button class="btn btn_6" @click="template_write('template_delivery_2')">配送：クロネコヤマト</button>
+                <button class="btn btn_6" @click="template_write('template_1')">海外生産のため</button>
+                <button class="btn btn_6" @click="template_write('template_2')">保証について</button>
+                <button class="btn btn_6" @click="template_write('template_3')">在庫品のため</button>
+                <button class="btn btn_6" @click="template_write('template_4')">納期について</button>
+                <button class="btn btn_6" @click="template_write('template_5')">導入事例</button>
+              </div>
+              <textarea name="outline" v-model="outline" v-html="outline"></textarea>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div class="btn_area center">
+            <button class="btn btn_1" @click="mode = 1">戻る</button>
+            <button class="btn btn_1" @click="checkEstimate">内容を確認する</button>
+          </div>
+        </section>
+      </template>
+      <template v-if="mode === 3">
+        <h2 class="page_title" v-html="page_tit"></h2>
+        <section class="top_section">
+          <div class="info_area">
+            <dl>
+              <dt>名前/会社名</dt>
+              <dd>{{ customer }} {{honor}}</dd>
+            </dl>
+
+            <dl>
+              <dt>案件名</dt>
+              <dd>{{ title }}</dd>
+            </dl>
+
+            <dl>
+              <dt>納期</dt>
+              <dd>{{ delivery }}</dd>
+            </dl>
+
+            <dl>
+              <dt>支払条件</dt>
+              <dd>{{ terms }}</dd>
+            </dl>
+
+            <dl>
+              <dt>納入場所</dt>
+              <dd>{{ address }}</dd>
+            </dl>
+
+            <dl>
+              <dt>見積もり期限</dt>
+              <dd>{{ deadline }}</dd>
+            </dl>
+
+            <dl>
+              <dt>担当者</dt>
+              <dd>{{ management }}</dd>
+            </dl>
+          </div>
+        </section>
+
+        <section>
+          <div class="cart_contents">
+            <dl class="cart_head">
+              <dt class="cart_short"><span>No.</span></dt>
+              <dt class="cart_long ver2"><span>製品番号</span></dt>
+              <dt class="cart_short"><span>数量</span></dt>
+              <dt class="cart_mid"><span>単価</span></dt>
+              <dt class="cart_mid"><span>金額</span></dt>
+              <dt class="cart_long ver2"><span>備考</span></dt>
+            </dl>
+            <dl v-for="(c,index) in cart">
+              <dd class="cart_short"><span>{{ index + 1 }}</span></dd>
+              <dd class="cart_long ver2"><span>{{ c.name }}</span></dd>
+              <dd class="cart_short"><span>{{ c.quant }}</span></dd>
+              <dd class="cart_mid"><span class="align_right">{{ c.price }}</span></dd>
+              <template v-if="c.type !== 2">
+                <dd class="cart_mid"><span class="align_right">{{ c.price * c.quant  | numberFormat | moneyDelimiter}}</span></dd>
+              </template>
+              <template v-else>
+                <dd class="cart_mid"></dd>
+              </template>
+
+              <dd class="cart_long ver2"><span>{{ c.remarks }}</textarea></span></dd>
+            </dl>
+            <div class="total_area">
+              <dl>
+                <dt>小計</dt>
+                <dd><span>{{ subtotal_price | numberFormat | moneyDelimiter }}円</span></dd>
+              </dl>
+              <dl>
+                <dt>消費税</dt>
+                <dd><span>{{ subtotal_price * (tax_rate - 1) | numberFormat | moneyDelimiter }}円</span></dd>
+              </dl>
+              <dl>
+                <dt>合計</dt>
+                <dd><span>{{ subtotal_price * tax_rate | numberFormat | moneyDelimiter }}円</span></dd>
+              </dl>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div class="outline_contents">
+            <p>【 備考 】</p>
+            <div class="outline_contents_child">{{ outline }}</div>
+
+          </div>
+        </section>
+
+        <section>
+          <div class="btn_area center">
+            <button class="btn btn_1" @click="mode = 2">戻る</button>
+            <button class="btn btn_1" v-if="action === 'insert'" @click="regEstimate">{{ btn_label }}</button>
+            <button class="btn btn_1" v-if="action === 'update'" @click="updEstimate">{{ btn_label }}</button>
+            <button class="btn btn_1" v-if="action === 'copy'" @click="regEstimate">{{ btn_label }}</button>
+          </div>
+        </section>
+      </template>
+
+      <template v-if="mode === 4">
+        <h2 class="page_title">{{result_dsp_tit}}</h2>
+        <section class="top_section">
+          <p v-html="result_dsp_desc"></p>
+          <div class="btn_area center">
+            <button class="btn btn_1"><a href="index.php">トップへ戻る</a></button>
+            <button class="btn btn_1"><a :href="'php/MakePdfEstimate.php?id='+estimate_id" target="_blank">見積書ダウンロード</a></button>
+          </div>
+        </section>
+      </template>
+
+    </div>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.8.4/Sortable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Vue.Draggable/2.23.2/vuedraggable.umd.min.js"></script>
+  <script type="text/javascript" src="component/outline_master.js"></script>
+  <script type="text/javascript" src="component/employee_master.js"></script>
+  <script type="text/javascript" src="component/svg_properties.js"></script>
+  <script>
+    const draggable = window['vuedraggable'];
+
+    let param_action = '<?= $action ?>';
+    let param_id = '<?= $id ?>';
+
+    let app = new Vue({
+      el: '#app',
+      data() {
+        return {
+          action: 'insert',
+          products: [],
+          searchWord: '',
+          honor: '御中',
+          is_modal_loading: false,
+          is_modal: false,
+          is_modal2: false,
+          modal_product_id: '', //現在モーダル中の製品ID
+          allSelect: false,
+          modal_weights: [], //モーダルウェイトボタン
+          selectWeights: [], //モーダルで選択したウェイト
+          selectQuant: 1,
+          cart: [],
+          mode: 1,
+          /*ページ2*/
+          tax_rate: 1.1,
+          ratio: '1',
+          ratio_before: '1',
+          estimate_id: '',
+          customer: '',
+          title: '',
+          delivery: '',
+          terms: '',
+          address: '',
+          deadline: '',
+          management: '',
+          outline: '',
+          cart_copied: [],
+          outline_template: outline_template,
+          employee_template: employee_template,
+					svg_properties: svg_properties,
+          /*モードによって切り替えるパーツ*/
+          page_tit: '',
+          btn_label: '',
+          result_dsp_tit: '',
+          result_dsp_desc: '',
+          /*モーダル２の在庫表示で使用*/
+          stockArr: [],
+					stockNumber: '',
+          /*API*/
+          auth_key: '',
+        }
+      },
+      components: {
+        'draggable': draggable,
+      },
+      watch: {
+        mode() {
+          this.ratio = 1;
+          this.scrollTopPosition();
+        },
+      },
+      computed: {
+        view_products() {
+          let products = Array.from(this.products);
+          let filtered = [];
+          let numberReg = new RegExp(this.searchWord, 'i');
+
+
+          filtered = products.filter(v => {
+            let is_view = false;
+
+            //型番検索絞り込み
+            if (v.number.match(numberReg)) {
+              is_view = true;
+            }
+            return is_view;
+          });
+
+          // 型番の重複削除
+          let result = filtered.filter((v, index, self) => {
+            const nameList = self.map(item => {
+              return item.name;
+            });
+            if (nameList.indexOf(v.name) === index) {
+              return v;
+            }
+          });
+
+          return result;
+        },
+        balanceNum() {
+          let btnNum = this.modal_weights.length;
+          let diff = btnNum % 4;
+          if (diff !== 0) {
+            return 4 - diff;
+          } else {
+            return diff;
+          }
+        },
+        subtotal_price() {
+          let result = 0;
+          this.cart.map(v => {
+            if (v.price) {
+              result += Number(v.price) * Number(v.quant);
+            }
+          });
+          return result;
+        },
+				view_stocks(){
+					let stocks = Array.from(this.stockArr);
+					let weights = stocks.map(v=>{return v.weight});
+					let unique = Array.from(new Set(weights));
+					
+					let views = [];			
+					for(var i in unique){
+						let viewObj = stocks.filter(v=>{
+							return v.weight === unique[i];
+						});
+						views.push(viewObj);
+					}
+					
+					return views;
+				},
+      },
+      created() {
+        //アクションの設定
+        if (param_action) {
+          this.action = param_action;
+        }
+        //idの設定
+        if (param_id) {
+          this.estimate_id = param_id;
+        }
+        this.getProducts();
+
+        switch (this.action) {
+          case 'insert':
+            this.changeParts(this.action);
+            break;
+          case 'update':
+            this.initLoadData();
+            break;
+          case 'copy':
+            this.initLoadData();
+            break;
+        }
+      },
+      mounted() {
+
+      },
+      methods: {
+        async getProducts() {
+          let self = this;
+          let result = [];
+          axios.get('php/GetData.php?action=product_all').then(res => {
+            result = self.shapeArrayObj(res.data.result_select);
+            result.map(v => {
+              v['quant'] = 1;
+              v['type'] = 0;
+            });
+            self.products = result;
+          });
+        },
+        // axiosによって取得したデータを整形する
+        shapeArrayObj(arr) {
+          let obj_arr = [];
+          //整形
+          for (var i in arr) {
+            let obj = {};
+            //キー値が数字でないもののみを抽出
+            let keys = Object.keys(arr[i]).filter((item) => {
+              return isNaN(Number(item.charAt(0)));
+            });
+            for (var j in keys) {
+              obj[keys[j]] = arr[i][keys[j]];
+            }
+            obj_arr.push(obj);
+          }
+          return obj_arr;
+        },
+        // axiosによって取得したデータを整形する
+        shapeArray(arr) {
+          //整形
+          let obj = {};
+          //キー値が数字でないもののみを抽出
+          let keys = Object.keys(arr).filter((item) => {
+            return isNaN(Number(item.charAt(0)));
+          });
+          for (var j in keys) {
+            obj[keys[j]] = arr[keys[j]];
+          };
+          return obj;
+        },
+        // 日付フォーマット
+        formatDate(date) {
+          let year = date.getFullYear();
+          let month = ("0" + (date.getMonth() + 1)).slice(-2);
+          let day = date.getDate();
+          return `${year}-${month}-${day}`;
+        },
+        // モーダルウィンドウを表示する
+        openModal(e, id) {
+          this.selectQuant = Number($(e.target).parents('dl').find('input[name="quant"]').val());
+          this.modal_product_id = id;
+
+          let filtered = this.products.filter(v => {
+            return v.product_id === id;
+          });
+					
+					//製品IDに紐づく価格データが複数の場合はモーダルを表示
+					if(filtered.length > 1){
+            this.is_modal = true;
+
+            //price順に並び替え
+            let sorted = filtered.sort((a, b) => {
+              return a.price - b.price;
+            });
+
+            //モーダル切り替え前後の差分を取得
+            let width = window.innerWidth;
+            let noScrollBar = document.body.clientWidth;
+
+            //モーダル切り替え
+            $('body').css('padding-right', width - noScrollBar);
+            $('body').css('overflow-y', 'hidden');
+
+
+
+            for (var i in sorted) {
+              this.modal_weights.push(sorted[i].weight);
+            }
+					}
+					//カートに追加
+          else if(filtered.length === 1){
+            this.selectWeights.push(filtered[0].weight);
+            this.addCart();
+          }
+          //その他エラーの場合
+          else{
+            alert('データの処理に失敗しました。管理者に連絡してください');
+          }					
+        },
+        // モーダルを閉じる
+        closeModal() {
+          this.is_modal = false;
+          this.allSelect = false;
+          this.modal_product_id = '';
+          this.modal_weights.splice(0);
+          this.selectWeights.splice(0);
+          $('body').css('padding-right', 0);
+          $('body').css('overflow-y', 'auto');
+        },
+        // 在庫状況モーダルON
+        stockModalOn(product_id,number) {
+          this.is_modal2 = true;
+					this.stockNumber = number;
+					this.stockArr.splice(0);	
+          this.getStock(product_id);		
+          //モーダル切り替え前後の差分を取得
+          let width = window.innerWidth;
+          let noScrollBar = document.body.clientWidth;
+
+          //モーダル切り替え
+          $('body').css('padding-right', width - noScrollBar);
+          $('body').css('overflow-y', 'hidden');					
+        },
+        // 在庫状況モーダルOFF
+        stockModalOff() {
+          let self = this;
+          self.is_modal2 = false;
+					$('body').css('padding-right', 0);
+          $('body').css('overflow-y', 'auto');
+        },
+        // モーダル画面外クリック時、アクティブなモーダルをOFFにする
+        frontModalOff(e) {
+          if ($(e.target).closest(".modal_child").length < 1 && $(e.target).closest(".modal").length < 1) {
+            if (this.is_modal) {
+              this.closeModal();
+            } else if(this.is_modal2) {
+              this.stockModalOff();
+            }
+          }
+        },				
+        // ウェイトクリック時の挙動制御
+        clickWeights(value) {
+          let index = this.selectWeights.indexOf(value);
+          if (index === -1) {
+            this.selectWeights.push(value);
+          } else {
+            this.selectWeights.splice(index, 1);
+          }
+        },
+        // カートに追加
+        addCart() {
+          let quant = this.selectQuant;
+
+          let id = this.modal_product_id;
+          let price_ids = this.selectWeights;
+
+          if (price_ids.length > 0) {
+            // 選択中の製品IDとウェイトに一致するデータだけ抽出
+            for (var i in this.products) {
+              if (this.products[i].product_id === id) {
+                if (price_ids.includes(this.products[i].weight)) {
+
+
+                  let priceIdArr = this.cart.map(v => {
+                    return v.price_id;
+                  });
+                  //すでにカートに入っている製品を追加する場合は数量だけプラスする
+                  let index = priceIdArr.indexOf(this.products[i].price_id);
+                  if (index !== -1) {
+                    this.cart[index].quant += quant;
+                  }
+                  //まだカートに入っていない製品はそのままカートに追加する
+                  else {
+                    this.cart.push({
+                      name: this.products[i].number + " " + this.products[i].name + " " + this.products[i].weight,
+                      price: this.products[i].price,
+                      org_price: this.products[i].price,
+                      price_id: this.products[i].price_id,
+                      quant: quant,
+                      order_num: this.cart.length + 1,
+                      type: 0,
+                      remarks: this.products[i].remarks,
+                      code: this.createRandom(),
+                    });
+                  }
+                }
+              }
+            }
+            swal("カートに追加されました。");
+            //モーダルを閉じる処理
+            this.closeModal();
+          }
+        },
+        // カートから削除
+        deleteCartOnce(index) {
+          this.cart.splice(index, 1);
+          swal("カートから1製品を削除しました");
+          this.changeOrderNum();
+        },
+        // カートに空の製品を追加（フリー入力）
+        addCartBlank() {
+          this.cart.push({
+            name: '',
+            price: '',
+            org_price: '',
+            price_id: '',
+            quant: 1,
+            type: 1,
+            order_num: this.cart.length + 1,
+            remarks: '',
+            code: this.createRandom(),
+          });
+        },
+        //カートに摘要を追加
+        addCartDescription() {
+          this.cart.push({
+            name: '',
+            price: '',
+            org_price: '',
+            price_id: '',
+            quant: '',
+            type: 2,
+            order_num: this.cart.length + 1,
+            remarks: '',
+            code: this.createRandom(),
+          });
+        },
+        // カート内のorder_numを常に昇順にする
+        changeOrderNum() {
+          for (var i in this.cart) {
+            this.cart[i].order_num = Number(i) + 1;
+          }
+        },
+        // ドラッグ開始時
+        dragStart(e) {
+          this.cart_copied = this.cart;
+        },
+        // ドラッグによる表示変更時
+        dragUpdate(e) {
+          //ドラッグ前後の位置関係が変化した場合のみ起動
+          if (e.newIndex !== e.oldIndex) {
+            // 移動先が移動前より下であれば
+            if (e.newIndex > e.oldIndex) {
+              let newNum = e.newIndex + 1; //spliceが手前に挿入するため＋１
+              let oldNum = e.oldIndex;
+              let copy_from = this.cart_copied[oldNum]; //移動する要素
+              this.cart.splice(newNum, 0, copy_from);
+              this.cart.splice(e.oldIndex, 1);
+            }
+            // 移動先が移動前より上であれば
+            else {
+              let newNum = e.newIndex;
+              let oldNum = e.oldIndex;
+              let copy_from = this.cart_copied[oldNum]; //移動する要素
+
+              this.cart.splice(newNum, 0, copy_from);
+              this.cart.splice(e.oldIndex + 1, 1);
+            }
+
+          }
+        },
+        // ドラッグ終了時、カートのordernumを変更する
+        dragEnd(e) {
+          this.changeOrderNum();
+        },
+        // すべての製品にチェック押下時
+        allPriceAddOrDel() {
+          this.allSelect = !this.allSelect;
+
+          if (!this.allSelect) {
+            this.selectWeights.splice(0);
+          } else {
+            for (var i in this.modal_weights) {
+              this.selectWeights.push(this.modal_weights[i]);
+            }
+          }
+        },
+        // 下部備考のテンプレートボタンクリック時、テキストエリアに自動入力する
+        template_write(param) {
+          let content = this.outline_template[param];
+
+          if (this.outline === '') {
+            this.outline += content;
+          } else {
+            this.outline += `\n${content}`;
+          }
+
+        },
+        // 内容を確認するボタン押下時
+        checkEstimate() {
+          let is_error = false;
+
+          if (!(this.customer && this.title && this.delivery && this.terms && this.address && this.deadline && this.management && this.cart.length > 0)) {
+            is_error = true;
+          }
+
+          //エラーなしの場合は内容確認画面に移動
+          if (!is_error) {
+            this.mode = 3;
+          } else {
+            swal("入力されていない項目があります。");
+          }
+        },
+        // ランダム文字列生成
+        createRandom() {
+          const LENGTH = 8 //生成したい文字列の長さ
+          const SOURCE = "abcdefghijklmnopqrstuvwxyz0123456789" //元になる文字
+          let result = ''
+          let filtered = [];
+
+          for (let i = 0; i < LENGTH; i++) {
+            result += SOURCE[Math.floor(Math.random() * SOURCE.length)];
+          }
+
+          filtered = this.cart.filter(v => {
+            if (v.code === result) {
+              return true;
+            }
+          });
+
+          if (filtered.length === 0) {
+            return result;
+          } else {
+            return -1;
+          }
+        },
+        // スクロールトップ
+        scrollTopPosition() {
+          $(window).scrollTop(0);
+        },
+        // 見積書を登録する
+        regEstimate() {
+            this.estimate_id = 99999;
+            this.changeParts('insert');
+            this.mode = 4;
+        },
+        // 更新＆複製時、見積データを読み込む
+        initLoadData() {
+          let self = this;
+          let shaped = [];
+          let shaped_2 = [];
+          let tie_ids = [];
+          let carts = [];
+
+          axios.get(`php/GetData.php?action=get_estimate&id=${this.estimate_id}`).then(res => {
+            if (res.status === 200) {
+              shaped = self.shapeArray(res.data.result_select);
+              this.customer = shaped.name.replace(/様|御中/, "");
+              this.honor = shaped.name.match(/様|御中/)[0];
+              this.title = shaped.title ? shaped.title : '';
+              this.delivery = shaped.delivery ? shaped.delivery : '';
+              this.terms = shaped.terms ? shaped.terms : '';
+              this.address = shaped.address ? shaped.address : '';
+              this.deadline = shaped.deadline ? shaped.deadline : '';
+              this.outline = shaped.outline ? shaped.outline : '';
+              this.management = shaped.m_name ? shaped.m_name : '';
+
+              tie_ids = shaped.tie_ids.replace(/,/g, "_");
+              axios.get(`php/GetData.php?action=get_estimate_tie&tie_id=${tie_ids}`).then(res => {
+                shaped_2 = self.shapeArrayObj(res.data.result_select);
+                for (var i = 0; i < shaped_2.length; i++) {
+                  //追加する製品情報を設定
+                  let cart = {
+                    tie_id: shaped_2[i].id,
+                    name: shaped_2[i].item_name,
+                    org_price: shaped_2[i].org_price ? shaped_2[i].org_price : '',
+                    price: shaped_2[i].unit_price ? shaped_2[i].unit_price : '',
+                    price_id: shaped_2[i].price_id ? shaped_2[i].price_id : '',
+                    quant: shaped_2[i].quantity ? shaped_2[i].quantity : '',
+                    order_num: shaped_2[i].order_num,
+                    type: Number(shaped_2[i].type),
+                    remarks: shaped_2[i].remarks ? shaped_2[i].remarks : '',
+                    code: self.createRandom()
+                  };
+                  carts.push(cart);
+                }
+                this.cart = carts.sort((a, b) => {
+                  return a.order_num - b.order_num;
+                });
+              });
+            }
+          });
+          this.changeParts(this.action);
+          this.mode = 2;
+        },
+        // 見積書を更新する
+        updEstimate() {
+          this.mode = 4;
+        },
+        // モードによって文章を切り替える
+        changeParts(act) {
+          console.log(this.estimate_id);
+          let action = act;
+          switch (action) {
+            case 'insert':
+              this.page_tit = '<img src="../img/title_create_new_estimate.svg" style="width: 250px;">';
+              this.btn_label = '見積書作成';
+              this.result_dsp_tit = '見積書を作成しました。';
+              this.result_dsp_desc = '見積書の新規作成に成功しました。作成した見積書のIDは「' + this.estimate_id + '」です。<br>見積書一覧ページからもPDFをダウンロード出来ます。<br>発注に進む場合は「発注ボタン」を押してください。';
+              break;
+            case 'update':
+              this.page_tit = '<img src="../img/title_update_estimate.svg" style="width: 250px;">';
+              this.btn_label = '見積書更新';
+              this.result_dsp_tit = '見積書の内容を更新しました。';
+              this.result_dsp_desc = '見積書の更新に成功しました。<br>見積書一覧ページからもPDFをダウンロード出来ます。<br>発注に進む場合は「発注ボタン」を押してください。';
+              break;
+            case 'copy':
+              this.page_tit = '<img src="../img/title_copy_estimate.svg" style="width: 250px;">';
+              this.btn_label = '見積書登録';
+              this.result_dsp_tit = '見積書を登録しました。';
+              this.result_dsp_desc = '見積書を複製し、内容をもとに新規登録しました。見積書IDは' + this.estimate_id + 'です。<br>見積書一覧ページからもPDFをダウンロード出来ます。<br>発注に進む場合は「発注ボタン」を押してください。';
+              break;
+          }
+        },
+        // 掛け率の設定
+        changeRatio() {
+          let self = this;
+
+          var options = {
+            text: '掛け率を変更すると現在カートに入っているすべての製品の価格を再計算します。\n手入力した価格情報はすべて初期値に戻ります。\nよろしいですか？', //\nでテキストの改行が出来ます
+            buttons: {
+              cancel: 'キャンセル',
+              ok: '掛け率を変更する'
+            }
+          };
+          swal(options).then(function(value) {
+            if (value) {
+              //表示するを選んだ場合の処理
+              self.ratio_before = self.ratio;
+              swal('掛け率を変更しました。');
+              let ratio = Number(self.ratio);
+              self.cart.map(v => {
+                if (v['type'] === 0) {
+                  v['price'] = Math.round(v.org_price * ratio);
+                  v['ratio_label'] = Math.round((1 - ratio) * 100);
+                }
+              });
+            } else {
+              self.ratio = self.ratio_before;
+            }
+          });
+        },
+        // 掛け率一括設定後に手入力で値を変えた場合、ラベル表示をなくす
+        labelOff(code) {
+          for (var i in this.cart) {
+            if (this.cart[i].code === code) {
+              this.cart[i].ratio_label = "";
+            }
+          }
+        },
+        // 販売管理システムから在庫を取得する
+        async getProductApi() {
+          let self = this;
+          let select_products = [];
+
+          return new Promise((resolve, reject) => {
+
+            for (var i in self.stockArr) {
+              let select_product = {
+                product_cd: self.stockArr[i].bo_id,
+                set_cd: null
+              };
+              select_products.push(select_product);
+            }
+            //送信用パラメータに集約
+            let param = {
+              "auth_key": self.auth_key,
+              "select_products": select_products
+            }
+            //JSON化しAPIから在庫情報を取得
+            let params = JSON.stringify(param);
+            this.getApi(params, 'get_product_list').then(res => {
+              //stockArrに在庫情報を追加
+              let result = res.data;
+							if(result){
+                for (var i in self.stockArr) {
+                  for (var j in result) {
+                    if (self.stockArr[i].bo_id === result[j].product_cd) {
+											self.stockArr[i]['stock'] = result[j].stock;
+                    }
+                  }
+                }								
+								resolve(1);
+							}else{
+								throw error;
+							}
+            }).catch(error => {
+              alert('API通信エラー: 在庫数の取得に失敗しました。');
+              reject(0);
+            });
+          });
+        },
+        // api通信用(※paramはJSONで渡すこと)
+        async getApi(param, action) {
+          let params = new URLSearchParams();
+          params.append('param', param);
+          let retVal = await axios.post('php/ConnectApi.php?action='+ action, params);
+					
+          if (retVal) {
+            return retVal;
+          }
+        },
+        // 在庫取得
+        async getStock(p_id) {
+					// ローディングアニメーション開始
+          this.is_modal_loading = true;
+          let self = this;
+          let shaped = [];
+
+					//製品データからproduct_idをもとにprice_idとweightのみのオブジェクトを作成する
+					let stocks = Array.from(new Set(this.products.filter(v=>{
+						return v.product_id === p_id;
+					}).map(v=>{ return {price_id:v.price_id, weight: v.weight}})));
+					
+					let price_ids = stocks.map(v=>{
+						return v.price_id;
+					});
+					console.log(price_ids);
+				
+          //送信前に整形
+          let price_ids_shaped = price_ids.join('_');
+					console.log(price_ids_shaped);
+					//価格IDが取得できない場合は処理中断
+          if (!price_ids_shaped) {
+            return;
+          }
+          //bo_id取得
+          await new Promise((resolve, reject) => {
+            axios.get(`php/GetData.php?action=get_product_cd&id=${price_ids_shaped}`).then(res => {
+              if (res.status === 200) {
+                shaped = self.shapeArrayObj(res.data.result_select);
+                //不要なプロパティ削除
+                shaped = shaped.map(v => {
+                  delete v.color_jp;
+                  delete v.id;
+                  return v;
+                });
+								
+								//取得したデータを価格IDを軸に合成
+								let stockObjArr = [];
+								for(var i in shaped){
+									for(var j in stocks){
+										if(shaped[i].price_id === stocks[j].price_id){
+											let stockObj = {
+												bo_id: shaped[i].bo_id,
+												price_id: shaped[i].price_id,
+												color_en: shaped[i].color_en,
+												weight: stocks[j].weight
+											}
+											stockObjArr.push(stockObj);
+										}
+									}
+								}
+								//ウェイト順に並び替え
+								let sorted = stockObjArr.sort((a,b)=>{
+									let aw = Number(a.weight.replace(/[a-zA-Z]+/,""));
+									let bw = Number(b.weight.replace(/[a-zA-Z]+/,""));
+									return aw - bw;
+								});
+								
+								self.stockArr = sorted;
+								
+                resolve(1);
+              } else {
+                reject("製品CDの取得に失敗しました。");
+              }
+            });
+          });
+          //API連携
+          //API連携
+          let gp_resp = await this.getProductApi();
+          if (gp_resp === 1) {
+            self.is_modal_loading = false;
+          }
+        }
+      },
+      filters: {
+        moneyDelimiter(value) {
+          return isNaN(Number(value)) ? value : value.toLocaleString();
+        },
+        numberFormat(num) {
+          return Math.round(num).toString().replace(
+            /(\d+?)(?=(?:\d{3})+$)/g,
+            function(x) {
+              return x + ',';
+            }
+          );
+        },
+      }
+    });
+  </script>
+</body>
+
+</html>
