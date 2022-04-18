@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <title>見積書一覧</title>
-<link rel="stylesheet" type="text/css" href="../css/reset.css?<?= date('His') ?>">
-<link rel="stylesheet" type="text/css" href="../css/common.css?<?= date('His') ?>">
-<link rel="stylesheet" href="../css/estimate_order.css?=<?=date('YmdHis')?>">
+<link rel="stylesheet" type="text/css" href="css/reset.css?<?= date('His') ?>">
+<link rel="stylesheet" type="text/css" href="css/common.css?<?= date('His') ?>">
+<link rel="stylesheet" href="css/estimate_order.css?=<?=date('YmdHis')?>">
 </head>
 <body>
 <main>
   <div class="container" id="app">
-		<h2 class="page_title"><img src="../img/title_estimate_list.svg" style="width:250px;"></h2>	
+		<h2 class="page_title"><img src="img/title_estimate_list.svg" style="width:250px;"></h2>	
 		<section class="flexible top_section">
 			<div class="search_area">
 				<label><input type="text" placeholder="見積書ID、顧客名で見積書を検索" v-model="searchWord"></label>	
