@@ -1,7 +1,3 @@
-<?php
-$action = isset($_GET['action']) ? $_GET['action'] : "";
-$id = isset($_GET['id']) ? $_GET['id'] : "";
-?>
 <!DOCTYPE html>
 <html lang="ja">
 
@@ -61,7 +57,7 @@ $id = isset($_GET['id']) ? $_GET['id'] : "";
             </dl>
           </div>
           <div class="btn_area center">
-            <button class="btn btn_1"><a href="index.php">一覧に戻る</a></button>
+            <button class="btn btn_1"><a href="index.html">一覧に戻る</a></button>
             <button class="btn btn_1" @click="mode = 2">詳細設定へ</button>
           </div>
         </section>
@@ -388,7 +384,7 @@ $id = isset($_GET['id']) ? $_GET['id'] : "";
         <section class="top_section">
           <p v-html="result_dsp_desc"></p>
           <div class="btn_area center">
-            <button class="btn btn_1"><a href="index.php">トップへ戻る</a></button>
+            <button class="btn btn_1"><a href="index.html">トップへ戻る</a></button>
             <button class="btn btn_1"><a :href="'php/MakePdfEstimate.php?id='+estimate_id" target="_blank">見積書ダウンロード</a></button>
           </div>
         </section>
@@ -405,11 +401,10 @@ $id = isset($_GET['id']) ? $_GET['id'] : "";
   <script type="text/javascript" src="component/outline_master.js"></script>
   <script type="text/javascript" src="component/employee_master.js"></script>
   <script type="text/javascript" src="component/svg_properties.js"></script>
+	<script src="./component/db_properties.json.js"></script>
   <script>
+		const jsonData = JSON.parse(JSON.stringify(window.ESTIMATE));
     const draggable = window['vuedraggable'];
-
-    let param_action = '<?= $action ?>';
-    let param_id = '<?= $id ?>';
 
     let app = new Vue({
       el: '#app',
@@ -531,14 +526,15 @@ $id = isset($_GET['id']) ? $_GET['id'] : "";
 				},
       },
       created() {
-        //アクションの設定
-        if (param_action) {
-          this.action = param_action;
-        }
-        //idの設定
-        if (param_id) {
-          this.estimate_id = param_id;
-        }
+				let action = this.getParam("action");
+				this.estimate_id = this.getParam("id");
+				
+				if(action){
+					this.action = action;
+				}else{
+					this.action = "insert";
+				}
+
         this.getProducts();
 
         switch (this.action) {
@@ -560,14 +556,14 @@ $id = isset($_GET['id']) ? $_GET['id'] : "";
         async getProducts() {
           let self = this;
           let result = [];
-          axios.get('php/GetData.php?action=product_all').then(res => {
-            result = self.shapeArrayObj(res.data.result_select);
-            result.map(v => {
-              v['quant'] = 1;
-              v['type'] = 0;
-            });
-            self.products = result;
+
+          result = self.shapeArrayObj(jsonData["products"]);
+          result.map(v => {
+            v['quant'] = 1;
+            v['type'] = 0;
           });
+          self.products = result;
+
         },
         // axiosによって取得したデータを整形する
         shapeArrayObj(arr) {
@@ -893,9 +889,12 @@ $id = isset($_GET['id']) ? $_GET['id'] : "";
           let tie_ids = [];
           let carts = [];
 
-          axios.get(`php/GetData.php?action=get_estimate&id=${this.estimate_id}`).then(res => {
-            if (res.status === 200) {
-              shaped = self.shapeArray(res.data.result_select);
+					let res = jsonData['estimate'].filter(v=>{
+						return v.id === Number(this.estimate_id);
+					});	
+					
+            if (res) {
+              shaped = self.shapeArray(res[0]);
               this.customer = shaped.name.replace(/様|御中/, "");
               this.honor = shaped.name.match(/様|御中/)[0];
               this.title = shaped.title ? shaped.title : '';
@@ -906,31 +905,33 @@ $id = isset($_GET['id']) ? $_GET['id'] : "";
               this.outline = shaped.outline ? shaped.outline : '';
               this.management = shaped.m_name ? shaped.m_name : '';
 
-              tie_ids = shaped.tie_ids.replace(/,/g, "_");
-              axios.get(`php/GetData.php?action=get_estimate_tie&tie_id=${tie_ids}`).then(res => {
-                shaped_2 = self.shapeArrayObj(res.data.result_select);
-                for (var i = 0; i < shaped_2.length; i++) {
-                  //追加する製品情報を設定
-                  let cart = {
-                    tie_id: shaped_2[i].id,
-                    name: shaped_2[i].item_name,
-                    org_price: shaped_2[i].org_price ? shaped_2[i].org_price : '',
-                    price: shaped_2[i].unit_price ? shaped_2[i].unit_price : '',
-                    price_id: shaped_2[i].price_id ? shaped_2[i].price_id : '',
-                    quant: shaped_2[i].quantity ? shaped_2[i].quantity : '',
-                    order_num: shaped_2[i].order_num,
-                    type: Number(shaped_2[i].type),
-                    remarks: shaped_2[i].remarks ? shaped_2[i].remarks : '',
-                    code: self.createRandom()
-                  };
-                  carts.push(cart);
-                }
-                this.cart = carts.sort((a, b) => {
-                  return a.order_num - b.order_num;
-                });
+              tie_ids = shaped.tie_ids.split(',');
+							
+							let res2 = jsonData['estimate_tie'].filter(v=>{
+								return tie_ids.includes(v.id);
+							});
+
+              shaped_2 = self.shapeArrayObj(res2);
+              for (var i = 0; i < shaped_2.length; i++) {
+                //追加する製品情報を設定
+                let cart = {
+                  tie_id: shaped_2[i].id,
+                  name: shaped_2[i].item_name,
+                  org_price: shaped_2[i].org_price ? shaped_2[i].org_price : '',
+                  price: shaped_2[i].unit_price ? shaped_2[i].unit_price : '',
+                  price_id: shaped_2[i].price_id ? shaped_2[i].price_id : '',
+                  quant: shaped_2[i].quantity ? shaped_2[i].quantity : '',
+                  order_num: shaped_2[i].order_num,
+                  type: Number(shaped_2[i].type),
+                  remarks: shaped_2[i].remarks ? shaped_2[i].remarks : '',
+                  code: self.createRandom()
+                };
+                carts.push(cart);
+              }
+              this.cart = carts.sort((a, b) => {
+                return a.order_num - b.order_num;
               });
             }
-          });
           this.changeParts(this.action);
           this.mode = 2;
         },
@@ -1013,16 +1014,18 @@ $id = isset($_GET['id']) ? $_GET['id'] : "";
               };
               select_products.push(select_product);
             }
-            //送信用パラメータに集約
-            let param = {
-              "auth_key": self.auth_key,
-              "select_products": select_products
-            }
-            //JSON化しAPIから在庫情報を取得
-            let params = JSON.stringify(param);
-            this.getApi(params, 'get_product_list').then(res => {
+
+						let result = jsonData['api_product_list'].filter(v=>{
+							let retFlg = false;
+							for(var i in select_products){
+								if(select_products[i].product_cd === v.product_cd){
+									retFlg = true;
+								}
+							}
+							return retFlg;
+						});
+						
               //stockArrに在庫情報を追加
-              let result = res.data;
 							if(result){
                 for (var i in self.stockArr) {
                   for (var j in result) {
@@ -1033,23 +1036,10 @@ $id = isset($_GET['id']) ? $_GET['id'] : "";
                 }								
 								resolve(1);
 							}else{
-								throw error;
+								alert('API通信エラー: 在庫数の取得に失敗しました。');
+              	reject(0);
 							}
-            }).catch(error => {
-              alert('API通信エラー: 在庫数の取得に失敗しました。');
-              reject(0);
-            });
           });
-        },
-        // api通信用(※paramはJSONで渡すこと)
-        async getApi(param, action) {
-          let params = new URLSearchParams();
-          params.append('param', param);
-          let retVal = await axios.post('php/ConnectApi.php?action='+ action, params);
-					
-          if (retVal) {
-            return retVal;
-          }
         },
         // 在庫取得
         async getStock(p_id) {
@@ -1066,20 +1056,19 @@ $id = isset($_GET['id']) ? $_GET['id'] : "";
 					let price_ids = stocks.map(v=>{
 						return v.price_id;
 					});
-					console.log(price_ids);
 				
-          //送信前に整形
-          let price_ids_shaped = price_ids.join('_');
-					console.log(price_ids_shaped);
 					//価格IDが取得できない場合は処理中断
-          if (!price_ids_shaped) {
+          if (!price_ids) {
             return;
           }
           //bo_id取得
           await new Promise((resolve, reject) => {
-            axios.get(`php/GetData.php?action=get_product_cd&id=${price_ids_shaped}`).then(res => {
-              if (res.status === 200) {
-                shaped = self.shapeArrayObj(res.data.result_select);
+						let res = jsonData['color'].filter(v=>{
+								return price_ids.includes(v.price_id);
+						});
+						
+              if (res) {
+                shaped = self.shapeArrayObj(res);
                 //不要なプロパティ削除
                 shaped = shaped.map(v => {
                   delete v.color_jp;
@@ -1115,7 +1104,6 @@ $id = isset($_GET['id']) ? $_GET['id'] : "";
               } else {
                 reject("製品CDの取得に失敗しました。");
               }
-            });
           });
           //API連携
           //API連携
@@ -1123,7 +1111,17 @@ $id = isset($_GET['id']) ? $_GET['id'] : "";
           if (gp_resp === 1) {
             self.is_modal_loading = false;
           }
-        }
+        },
+				// URLパラメータ取得
+        getParam(name){
+            let url = window.location.href;
+            name = name.replace(/[\[\]]/g, "\\$&");
+            let regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
+            let results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, " "));
+        }				
       },
       filters: {
         moneyDelimiter(value) {
