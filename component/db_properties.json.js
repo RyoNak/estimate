@@ -1,4 +1,4 @@
-{
+window.ESTIMATE = {
   "estimate": [
     {
       "address": "takasakiyama@example.com",
@@ -626,4 +626,4 @@
       "stock": 0
     }
   ]
-}
+};

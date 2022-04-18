@@ -16,7 +16,7 @@
 				<label><input type="text" placeholder="見積書ID、顧客名で見積書を検索" v-model="searchWord"></label>	
 			</div>
 			<div class="btn_area layout_1">
-				<button class="btn btn_1"><a href="insert_estimate.php">見積書新規作成</a></button>
+				<button class="btn btn_1"><a href="insert_estimate.html">見積書新規作成</a></button>
 			</div>
 		</section>
 		<section>
@@ -33,8 +33,8 @@
               <dd class="e_reg_date">{{ e.reg_date }}</dd>
               <dd class="btn_area layout_2">
                 <button class="btn btn_2"><a :href="'php/MakePdfEstimate.php?id='+e.id" target="_blank">ダウンロード</a></button>
-                <button class="btn btn_2"><a :href="'insert_estimate.php?action=copy&id='+e.id">複製</a></button>
-                <button class="btn btn_2"><a :href="'insert_estimate.php?action=update&id='+e.id">編集</a></button>
+                <button class="btn btn_2"><a :href="'insert_estimate.html?action=copy&id='+e.id">複製</a></button>
+                <button class="btn btn_2"><a :href="'insert_estimate.html?action=update&id='+e.id">編集</a></button>
               </dd>
 						</dl>
 						<dl v-if="view_estimates.length === 0">
@@ -48,7 +48,10 @@
 <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<script src="./component/db_properties.json.js"></script>
 <script>
+	const jsonData = JSON.parse(JSON.stringify(window.ESTIMATE));
+	
 	let app = new Vue({
 		el: '#app',
 		data(){
@@ -62,21 +65,22 @@
 			view_estimates(){
 				let filtered = [];
 				
-				let nameReg = new RegExp(this.searchWord);
-				let idReg = new RegExp(this.searchWord);
-				
-				
-				filtered = this.estimates.filter(v=>{
-					let is_view = false;
-					if(v.name.match(nameReg)){
-						is_view = true;
-					}
-					else if(v.id.match(idReg)){
-						is_view = true;
-					}
-					return is_view;
-				});
-				
+				if(this.estimates.length > 0){
+          let nameReg = new RegExp(this.searchWord);
+          let idReg = new RegExp(this.searchWord);
+
+
+          filtered = this.estimates.filter(v=>{
+            let is_view = false;
+            if(v.name.match(nameReg)){
+              is_view = true;
+            }
+            else if(String(v.id).match(idReg)){
+              is_view = true;
+            }
+            return is_view;
+          });					
+				}
 				return filtered;
 			},
 		},
@@ -87,13 +91,12 @@
 			getEstimate(){
 				let self = this;
 				let result = [];
-				axios.get('php/GetData.php?action=estimate_all').then(res=>{
-					result = self.shapeArray(res.data.result_select);
-					result = result.sort((a,b)=>{
-						return b.reg_date - a.reg_date;
-					});
-					self.estimates = result;
-				});
+				
+        result = self.shapeArray(jsonData['estimate']);
+        result = result.sort((a,b)=>{
+          return b.reg_date - a.reg_date;
+        });
+        self.estimates = result;
 			},
       // axiosによって取得したデータを整形する
       shapeArray(arr){
