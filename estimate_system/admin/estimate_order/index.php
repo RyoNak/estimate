@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>見積書一覧</title>
+<link rel="stylesheet" type="text/css" href="../css/reset.css?<?= date('His') ?>">
+<link rel="stylesheet" type="text/css" href="../css/common.css?<?= date('His') ?>">
+<link rel="stylesheet" href="../css/estimate_order.css?=<?=date('YmdHis')?>">
+</head>
+<body>
+<main>
+  <div class="container" id="app">
+		<h2 class="page_title"><img src="../img/title_estimate_list.svg" style="width:250px;"></h2>	
+		<section class="flexible top_section">
+			<div class="search_area">
+				<label><input type="text" placeholder="見積書ID、顧客名で見積書を検索" v-model="searchWord"></label>	
+			</div>
+			<div class="btn_area layout_1">
+				<button class="btn btn_1"><a href="insert_estimate.php">見積書新規作成</a></button>
+			</div>
+		</section>
+		<section>
+			<div class="result_area">
+				<div class="result_area_list">
+						<dl class="result_area_list_head">
+							<dt class="e_id">見積書ID</dt>
+							<dt class="e_title">顧客名</dt>
+							<dt class="e_reg_date">更新日</dt>
+						</dl>
+						<dl v-for="e in view_estimates">
+              <dd class="e_id">ID : {{ e.id }}</dd>
+              <dd class="e_title">{{ e.name }}</dd>
+              <dd class="e_reg_date">{{ e.reg_date }}</dd>
+              <dd class="btn_area layout_2">
+                <button class="btn btn_2"><a :href="'php/MakePdfEstimate.php?id='+e.id" target="_blank">ダウンロード</a></button>
+                <button class="btn btn_2"><a :href="'insert_estimate.php?action=copy&id='+e.id">複製</a></button>
+                <button class="btn btn_2"><a :href="'insert_estimate.php?action=update&id='+e.id">編集</a></button>
+              </dd>
+						</dl>
+						<dl v-if="view_estimates.length === 0">
+							<dd>該当する見積書がありませんでした。</dd>
+						</dl>
+				</div>
+			</div>
+		</section>
+  </div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<script>
+	let app = new Vue({
+		el: '#app',
+		data(){
+			return {
+				estimates: [],
+				searchWord: '',
+				searchId: '',
+			}
+		},
+		computed:{
+			view_estimates(){
+				let filtered = [];
+				
+				let nameReg = new RegExp(this.searchWord);
+				let idReg = new RegExp(this.searchWord);
+				
+				
+				filtered = this.estimates.filter(v=>{
+					let is_view = false;
+					if(v.name.match(nameReg)){
+						is_view = true;
+					}
+					else if(v.id.match(idReg)){
+						is_view = true;
+					}
+					return is_view;
+				});
+				
+				return filtered;
+			},
+		},
+		created(){
+			this.getEstimate();
+		},
+		methods:{
+			getEstimate(){
+				let self = this;
+				let result = [];
+				axios.get('php/GetData.php?action=estimate_all').then(res=>{
+					result = self.shapeArray(res.data.result_select);
+					result = result.sort((a,b)=>{
+						return b.reg_date - a.reg_date;
+					});
+					self.estimates = result;
+				});
+			},
+      // axiosによって取得したデータを整形する
+      shapeArray(arr){
+        let obj_arr = [];
+        //整形
+        for(var i in arr){
+          let obj = {};
+          //キー値が数字でないもののみを抽出
+          let keys = Object.keys(arr[i]).filter((item)=>{
+            return isNaN(Number(item.charAt(0)));
+          });
+          for(var j in keys){
+            obj[keys[j]] = arr[i][keys[j]];
+          }
+          obj_arr.push(obj);
+        }
+        return obj_arr;
+      },			
+      // 日付フォーマット
+      formatDate(date){
+        let year = date.getFullYear();
+        let month = ("0" + (date.getMonth()+1)).slice(-2);
+        let day = date.getDate();
+        return `${year}-${month}-${day}`;
+      },			
+		},
+	});
+	
+</script>
+</body>
+</html>

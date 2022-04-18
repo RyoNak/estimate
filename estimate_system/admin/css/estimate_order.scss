@@ -1,0 +1,792 @@
+/*初期化*/
+input,
+button,
+textarea {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  font: inherit;
+  outline: none;
+}
+textarea {
+  resize: vertical;
+}
+input[type='checkbox'],
+input[type='radio'] {
+  display: none;
+}
+input[type='submit'],
+input[type='button'],
+label,
+button,
+select { 
+  cursor: pointer;
+}
+select::-ms-expand {
+  display: none;
+}
+p{
+	margin: 0;
+}
+a{  
+	display: block;
+	text-decoration: none;
+	color: inherit;
+	&:hover{
+		color: inherit;
+		text-decoration: none;
+	}  
+}
+body {
+ overflow-y: scroll;
+}
+/*formパーツCSS*/
+input,textarea {
+	border: 2px solid #ddd;
+  border-radius: 0px;
+	transition: all .1s ease;
+	&:focus{
+		border: 2px solid #FF5053;
+	}
+}
+/*汎用*/
+.flexible{
+	display: flex;
+	justify-content: space-between;
+	flex-wrap: wrap;
+}
+.top_section{
+	margin-bottom: 50px;
+}
+.btn_area {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+	&.center{
+		justify-content: center;
+		margin-top: 80px;
+	}
+	&.layout_3{
+		margin-right: 15px;
+	}
+	button{
+		user-select: none;
+		display: block;
+		padding: 10px 20px;
+		&.btn_1{
+			color: #fff;
+			background: #3c3f4d;
+			width: 250px;
+			font-size: 18px;
+		}
+		&.btn_2{
+			padding: 3px 15px;
+			background: #3c3f4d;
+			color: #fff;
+			border-radius: 5px;
+			font-size: 13px; 
+		}
+		&.btn_3{
+			width: 132.5px;
+			padding: 10px 20px;
+			border: 1px solid #3c3f4d;
+			color: #3c3f4d;
+			border-radius: 5px;
+			font-size: 15px;	
+			margin-bottom: 10px;
+			&.active{
+				color: #fff;
+				background: #3c3f4d;
+			}
+			&.hide{
+				visibility: hidden;
+			}
+		}
+		&.btn_5{
+			padding: 3px 15px;
+			background: #701F1F;
+			color: #fff;
+			border-radius: 5px;
+			font-size: 13px;			
+		}
+		&.btn_6{
+			color: #fff;
+			background: #333;
+		}
+		&.btn_7{
+			color: #0024FF;
+			text-decoration: underline;
+		}
+		& + button{
+			margin-left: 10px;
+		}
+		&.disabled{
+			pointer-events: none;
+			opacity: 0.2;
+		}
+	}
+  .commit_btn{
+    width: 100%;
+    display: flex;
+		flex-wrap: wrap;
+    button.btn_4{
+			width: 240px;
+      padding: 10px 20px;
+      background: #E74C3D;
+      color: #fff;
+      border-radius: 5px;
+      font-size: 15px;
+      margin: 40px auto 0;
+    }    
+		button.btn_5{
+			width: 240px;
+      padding: 10px 20px;
+      background: #3C8FE7;
+      color: #fff;
+      border-radius: 5px;
+      font-size: 15px;
+      margin: 40px auto 0;
+    }
+		label{
+			width: 100%;
+			display: block;
+			margin: 30px 0 0;
+			padding-left: 25px; 
+			position: relative;
+			&::before,&::after{
+				content: '';
+				position: absolute;
+			}
+			&::before{
+				top: 50%;
+				left: 0;
+				transform: translateY(-50%);
+				width: 20px;
+				height: 20px;
+				border: 1px solid #333;				
+			}
+			&::after{
+				top: 8px;
+				left: 4px;
+				transform: translateY(-50%) rotate(45deg);
+				width: 13px;
+				height: 20px;
+				border-style: solid;
+				border-width: 2px;
+				border-color: transparent;
+			}
+			
+			&.active::after{
+				border-color: transparent #333 #333 transparent;
+			}
+		}
+  }	
+}
+.icon_area{
+	border: 2px solid;
+	border-color: #333;
+	border-radius: 20px;
+	padding: 3px;	
+	cursor: pointer;
+	transition: background .5s ease;
+	svg{
+		width: 100%;
+	}
+	&:hover{
+		background: #00b1ff;
+	}
+}
+.overscroll{
+	overflow: scroll;
+	height: 300px;
+}
+/*ページ上部*/
+h2.page_title{
+	justify-content: center;
+}
+.search_area {
+	label{
+		width: 500px;
+		margin: 0;
+		input{
+			width: 100%;
+			padding: 10px;
+		}
+	}
+}
+
+/*見積書データ、製品検索部*/ 
+.result_area_list{
+	padding: 0;
+	margin: 0;
+	dl{
+		display: flex;
+		justify-content: flex-start;
+		align-items: center;
+		flex-wrap: wrap;
+		padding: 10px;
+		border: 1px solid #d0d0d0;
+		margin: 0;
+		font-size: 13px;
+		& + dl{
+			margin-top: 0px;
+			border-width: 0px 1px 1px 1px;
+		}
+		dt,dd{
+			margin: 0;
+			font-weight: normal;
+		}
+		&.result_area_list_head{
+			background: #3c3f4d;
+			color: #fff;
+		} 
+		.e_id{
+			width: 10%;
+		}
+		.e_title{
+			width: 40%;
+			padding-right: 25px;
+		}
+		.e_reg_date{
+			margin-right: auto;
+		}
+		.e_modified_by{
+			width: 10%; 
+		}
+		.p_number{
+			width: 50%;
+			margin-right: auto;
+		}
+		.p_stock{
+			width: 35px;
+			margin-right: 20px;
+		}
+		.p_quant{
+			width: 15%;
+			display: flex;
+			justify-content: space-between;
+			flex-wrap: wrap;
+			span{
+				margin-left: 10px;
+        input{
+          width: 50px; 
+          text-align: right;
+          padding: 0 5px;
+        }				
+			}
+		}
+	}
+}
+
+/*モーダル*/
+.modal_back{
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0,0,0,0.50);
+	z-index: 10000;
+	.modal{
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%,-50%);
+		padding: 20px;
+		background: #fff;
+		width: 600px;
+		z-index: 10001;
+		p{
+			margin-bottom: 20px;
+		}
+		.btn_area{
+			justify-content: space-between;
+			button + button{
+				margin-left: 0px;
+			}
+		}
+		.btn_close{
+			position: absolute;
+			top: 0;
+			right: 0;
+			line-height: 1;
+			padding: 10px 15px;
+		}		
+	}
+	.modal_child{
+		position: absolute;
+		top: 50%;	
+		left: 50%;
+		transform: translate(-50%,-50%);
+		background: #f9f9f9;
+		width: 370px;	
+		height: 50%;
+		z-index: 10002;
+		overflow: scroll;
+		box-shadow: rgba(0, 0, 0, 0.25) 0px 14px 28px, rgba(0, 0, 0, 0.22) 0px 10px 10px;
+		.mc_child{
+			color: #000;
+			margin-bottom: 15px;
+			dl{
+				width: 100%;
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        font-size: 11px; 			
+				margin: 0 0 5px; 
+				line-height: 1;
+				&.top{
+					margin-bottom: 10px;
+				}
+				dt,dd{
+					width: 33%;
+					margin: 0;
+					text-align: center;
+				}
+			}
+      h4{ 
+				font-size: 13px;
+				line-height: 1;
+        padding: 5px 10px;
+        border-bottom: 1px solid;
+      }
+		}
+		.btn_close{
+			position: fixed;
+			top: 0;
+			right: 0;
+			line-height: 1;
+			padding: 10px 15px;
+		}		
+		.stock_title{
+      position: relative;
+      display: inline-block;
+      margin: 1rem 0 1rem -10px;
+      padding: 0.5rem 3rem;
+      color: #fff;
+      border-radius: 0 100vh 100vh 0;
+      background: #0075a9;
+      -webkit-box-shadow: 3px 3px 5px rgba(0, 0, 0, .2);
+      box-shadow: 3px 3px 5px rgba(0, 0, 0, .2);
+			&::before{
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        width: 0;
+        height: 0;
+        content: '';
+        border-top: 10px solid #005276;
+        border-left: 10px solid transparent;
+			}
+		}
+	}
+}
+
+/*カート*/
+.cart_area{
+	margin-top: 100px;
+	.btn_area{
+		
+	}
+	dl{
+		.p_price{
+			margin-right: 30px;
+			input{
+				width: 120px;
+				text-align: right;
+			}
+		}
+		.p_quant{
+			width: 10%;
+			span{
+				margin-left: 0;
+			}
+		}
+		.btn_area{
+			margin-left: auto;
+		}
+	}
+}
+
+/*2ページ目*/
+.info_area{
+	dl{
+		display: flex;
+		justify-content: flex-start;
+		flex-wrap: wrap;
+		dt{
+			width: 18%;
+			margin-right: 10px;
+			span{
+				font-size: 0.8em;
+				color: #f00;
+				margin-left: 10px;
+			}
+		}
+		dd{
+			width: 80%;
+			input.text_long{
+				width: 425px;
+			}
+		}
+	}
+}
+.cart_contents{
+	font-size: 13px;
+	dl{
+		display: flex;
+		justify-content: flex-start;
+		flex-wrap: wrap;
+		margin: 0;
+		&:first-child dt{
+			border-width: 1px 1px 1px 0;
+			&:nth-child(1){
+				border-width: 1px;
+			}
+		}
+		dt,dd{
+			font-weight: normal;
+			padding: 5px 10px;
+			border-style: solid;
+			border-color: #fff; 
+			border-width: 0 1px 1px 0;
+			margin: 0;
+			display: flex;
+			justify-content: center;
+			align-content: flex-start;
+			align-items: center;
+			&:nth-child(1){
+				border-width: 0 1px 1px;
+			}
+			span{
+				width: 100%;
+				&.align_right{
+					text-align: right;
+				}
+			}
+		}
+		dt{
+			background: #aaa;
+			color: #fff;		
+			border-color: #7C7C7C;
+			text-align: center;
+		}
+		dd{ 
+			background: #fff;
+			color: #000;
+			border-color: #7C7C7C;
+			position: relative;
+		}
+    .cart_short{
+      width: 6%;
+    }
+    .cart_mid{
+      width: 8%;
+    } 
+    .cart_long{
+      width: 34%;
+			&.ver2{
+				width: 36%;
+			}
+			&.ver3{
+				padding-right: 70px;
+			}
+    }
+		.cart_mini{
+			width: 4%;
+			.btn_area{
+				margin-top: 0;
+				button.btn_2{
+					padding: 3px 10px;
+				}
+			}
+		}
+		input{
+			width: 90%;
+			display: block;
+			margin: 0 auto;
+		}
+		textarea{
+			width: 100%;
+			height: 30px;
+		}
+		.ratio_label{
+      position: absolute;
+      top: 50%;
+      right: 5px;
+			transform: translateY(-50%);
+      line-height: 1;
+      background: red;
+      color: #fff;
+      padding: 5px 8px;
+      font-size: 10px;	
+			animation: fluffy1 3s ease infinite;
+		}
+	}
+	.btn_area{
+		margin-top: 20px;
+	}
+	.total_area{
+		text-align: right;
+		margin-top: 50px;
+		font-size: 17px;
+		dl{
+			width: 20%;
+			justify-content: space-between;
+			margin-left: auto;
+			line-height: 1.3;
+			dt,dd{
+				width: auto;
+				background: #fff;
+				color: #333;
+				border: 0;
+			}
+		}
+	}
+}
+.outline_contents{
+	font-size: 13px;
+	margin-top: 50px;
+  p{
+    width: 100%;
+    background: #aaa;
+    color: #fff;
+  }	
+	.outline_contents_child{
+    display: flex;
+    flex-wrap: wrap;
+		padding: 15px;
+		border: 1px solid #ddd;
+		white-space: pre-line;
+		.outline_template{
+			margin: 15px 0;
+			&.btn_area{
+				justify-content: flex-start;
+				button{
+					margin-right: 10px;
+					margin-bottom: 10px;
+				}
+				button + button{
+					margin-left: 0;
+				}
+			}
+		}
+    textarea{
+      width: 100%;
+			min-height: 250px;
+    }		
+	}
+}
+
+
+/*発注書作成ページ*/
+.order_container{
+	max-width: 1400px;
+  h2.page_title{
+    position: relative;
+    span{
+      display: block;
+      position: absolute;
+      top: 0;
+      right: 0;
+      font-size: 13px;
+    }
+  }
+  .page_desc{
+    font-size: 13px;
+    margin-bottom: 60px;
+    span{
+      color: #ff0000;
+    }
+  }
+  .total_price{
+    font-size: 15px;
+    color: #000;
+    border-bottom: 4px double #000;
+    display: inline-block;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    line-height: 1;
+    span{
+      font-size: 25px;
+      font-weight: bold;
+      margin-left: 20px;
+      margin-right: 10px;
+    }
+  }
+  .tie_contents{
+		color: #000;
+    font-size: 13px;
+    dl{
+      display: flex;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+      margin: 0;
+			&.active{
+				background: #ffd5d6;
+			}			
+      &:first-child dt{
+        border-width: 1px 1px 1px 0;
+        &:nth-child(1){
+          border-width: 1px;
+        }
+      }
+      dt,dd{
+        font-weight: normal;
+        padding: 5px;
+        border-style: solid;
+        border-color: #fff; 
+        border-width: 0 1px 1px 0;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-content: flex-start;
+        align-items: center;
+        &:nth-child(1){
+          border-width: 0 1px 1px;
+        }
+        span{
+          width: 100%;
+          &.align_right{
+            text-align: right;
+          }
+        }
+      }
+      dt{
+        background: #aaa;
+        border-color: #7C7C7C;
+        text-align: center;
+      }
+      dd{ 
+        border-color: #7C7C7C;
+        position: relative;
+      }
+      .cart_short{
+        width: 4%;
+      }
+      .cart_mid{
+        width: 7%;
+      } 
+      .cart_long{
+        width: 28%;
+      }
+			.cart_last{
+				width: 22%;
+				select{
+					width: 90%;
+				}
+			}
+      input{
+        width: 90%;
+        display: block;
+        margin: 0 auto;
+      }
+      textarea{
+        width: 100%;
+        height: 30px;
+      }
+      .ratio_label{
+        position: absolute;
+        top: 50%;
+        right: 5px;
+        transform: translateY(-50%);
+        line-height: 1;
+        background: red;
+        color: #fff;
+        padding: 5px 8px;
+        font-size: 10px;	
+        animation: fluffy1 3s ease infinite;
+      }
+    }
+    .btn_area{
+      margin-top: 20px;
+    }
+    .total_area{
+      text-align: right;
+      margin-top: 50px;
+      font-size: 17px;
+      dl{
+        width: 20%;
+        justify-content: space-between;
+        margin-left: auto;
+        line-height: 1.3;
+        dt,dd{
+          width: auto;
+          background: #fff;
+          color: #333;
+          border: 0;
+        }
+      }
+    }
+  }
+  /*loader*/
+  .loader{
+    margin: 20vh auto;
+  }	
+}
+/*アニメーション*/
+@keyframes fluffy1 {
+  0% { transform:translateY(-50%) }
+  5% { transform:translateY(-50%) }
+  10% { transform:translateY(-50%) }
+  20% { transform:translateY(-35%) }
+  25% { transform:translateY(-50%) }
+  30% { transform:translateY(-35%) }
+  50% { transform:translateY(-50%) }
+  100% { transform:translateY(-50%) }
+}
+@keyframes fadeModal {
+  0% { opacity: 0 }
+  100% { opacity: 1 }
+}
+.loader_est {
+	margin: 0 auto;
+  font-size: 18px;
+  width: 1em;
+  height: 1em;
+	top: 50%;
+  border-radius: 50%;
+  position: relative;
+  text-indent: -9999em;
+  -webkit-animation: loading 1.1s infinite ease;
+  animation: loading 1.1s infinite ease;
+  -webkit-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  transform: translateZ(0);
+}
+@keyframes loading {
+  0%,
+  100% {
+    box-shadow: 0em -2.6em 0em 0em #4C4C4C, 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2), 2.5em 0em 0 0em rgba(255, 255, 255, 0.2), 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.2), 0em 2.5em 0 0em rgba(255, 255, 255, 0.2), -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.2), -2.6em 0em 0 0em rgba(255, 255, 255, 0.5), -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.7);
+  }
+  12.5% {
+    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.7), 1.8em -1.8em 0 0em #4C4C4C, 2.5em 0em 0 0em rgba(255, 255, 255, 0.2), 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.2), 0em 2.5em 0 0em rgba(255, 255, 255, 0.2), -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.2), -2.6em 0em 0 0em rgba(255, 255, 255, 0.2), -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.5);
+  }
+  25% {
+    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.5), 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.7), 2.5em 0em 0 0em #4C4C4C, 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.2), 0em 2.5em 0 0em rgba(255, 255, 255, 0.2), -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.2), -2.6em 0em 0 0em rgba(255, 255, 255, 0.2), -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2);
+  }
+  37.5% {
+    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.2), 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.5), 2.5em 0em 0 0em rgba(255, 255, 255, 0.7), 1.75em 1.75em 0 0em #4C4C4C, 0em 2.5em 0 0em rgba(255, 255, 255, 0.2), -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.2), -2.6em 0em 0 0em rgba(255, 255, 255, 0.2), -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2);
+  }
+  50% {
+    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.2), 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2), 2.5em 0em 0 0em rgba(255, 255, 255, 0.5), 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.7), 0em 2.5em 0 0em #4C4C4C, -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.2), -2.6em 0em 0 0em rgba(255, 255, 255, 0.2), -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2);
+  }
+  62.5% {
+    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.2), 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2), 2.5em 0em 0 0em rgba(255, 255, 255, 0.2), 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.5), 0em 2.5em 0 0em rgba(255, 255, 255, 0.7), -1.8em 1.8em 0 0em #4C4C4C, -2.6em 0em 0 0em rgba(255, 255, 255, 0.2), -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2);
+  }
+  75% {
+    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.2), 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2), 2.5em 0em 0 0em rgba(255, 255, 255, 0.2), 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.2), 0em 2.5em 0 0em rgba(255, 255, 255, 0.5), -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.7), -2.6em 0em 0 0em #4C4C4C, -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2);
+  }
+  87.5% {
+    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.2), 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2), 2.5em 0em 0 0em rgba(255, 255, 255, 0.2), 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.2), 0em 2.5em 0 0em rgba(255, 255, 255, 0.2), -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.5), -2.6em 0em 0 0em rgba(255, 255, 255, 0.7), -1.8em -1.8em 0 0em #4C4C4C;
+  }
+}
+.modal2-leave-active{
+	animation: fadeModal .2s reverse;
+}
+.modal2-enter-active {
+	animation: fadeModal .2s;
+}

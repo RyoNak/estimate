@@ -1,0 +1,358 @@
+@charset "UTF-8";
+/* CSS Document */
+@import url("https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@300;400;500&family=Shippori+Mincho+B1:wght@400;500;600;700;800&display=swap");
+/*変数*/
+/*関数*/
+/*
+ 初期設定 
+*/
+[v-cloak] {
+  display: none; }
+
+* {
+  box-sizing: border-box;
+  font-family: 'Kiwi Maru', serif;
+  font-weight: 300; }
+
+body, html {
+  font-size: 100%;
+  line-height: 1.6;
+  color: #808080;
+  background-color: #ffffff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25'%3E%3Cdefs%3E%3ClinearGradient id='a' gradientUnits='userSpaceOnUse' x1='0' x2='0' y1='0' y2='100%25' gradientTransform='rotate(360,960,468)'%3E%3Cstop offset='0' stop-color='%23ffffff'/%3E%3Cstop offset='1' stop-color='%23C3FFF8'/%3E%3C/linearGradient%3E%3Cpattern patternUnits='userSpaceOnUse' id='b' width='630' height='525' x='0' y='0' viewBox='0 0 1080 900'%3E%3Cg fill-opacity='0.02'%3E%3Cpolygon fill='%23444' points='90 150 0 300 180 300'/%3E%3Cpolygon points='90 150 180 0 0 0'/%3E%3Cpolygon fill='%23AAA' points='270 150 360 0 180 0'/%3E%3Cpolygon fill='%23DDD' points='450 150 360 300 540 300'/%3E%3Cpolygon fill='%23999' points='450 150 540 0 360 0'/%3E%3Cpolygon points='630 150 540 300 720 300'/%3E%3Cpolygon fill='%23DDD' points='630 150 720 0 540 0'/%3E%3Cpolygon fill='%23444' points='810 150 720 300 900 300'/%3E%3Cpolygon fill='%23FFF' points='810 150 900 0 720 0'/%3E%3Cpolygon fill='%23DDD' points='990 150 900 300 1080 300'/%3E%3Cpolygon fill='%23444' points='990 150 1080 0 900 0'/%3E%3Cpolygon fill='%23DDD' points='90 450 0 600 180 600'/%3E%3Cpolygon points='90 450 180 300 0 300'/%3E%3Cpolygon fill='%23666' points='270 450 180 600 360 600'/%3E%3Cpolygon fill='%23AAA' points='270 450 360 300 180 300'/%3E%3Cpolygon fill='%23DDD' points='450 450 360 600 540 600'/%3E%3Cpolygon fill='%23999' points='450 450 540 300 360 300'/%3E%3Cpolygon fill='%23999' points='630 450 540 600 720 600'/%3E%3Cpolygon fill='%23FFF' points='630 450 720 300 540 300'/%3E%3Cpolygon points='810 450 720 600 900 600'/%3E%3Cpolygon fill='%23DDD' points='810 450 900 300 720 300'/%3E%3Cpolygon fill='%23AAA' points='990 450 900 600 1080 600'/%3E%3Cpolygon fill='%23444' points='990 450 1080 300 900 300'/%3E%3Cpolygon fill='%23222' points='90 750 0 900 180 900'/%3E%3Cpolygon points='270 750 180 900 360 900'/%3E%3Cpolygon fill='%23DDD' points='270 750 360 600 180 600'/%3E%3Cpolygon points='450 750 540 600 360 600'/%3E%3Cpolygon points='630 750 540 900 720 900'/%3E%3Cpolygon fill='%23444' points='630 750 720 600 540 600'/%3E%3Cpolygon fill='%23AAA' points='810 750 720 900 900 900'/%3E%3Cpolygon fill='%23666' points='810 750 900 600 720 600'/%3E%3Cpolygon fill='%23999' points='990 750 900 900 1080 900'/%3E%3Cpolygon fill='%23999' points='180 0 90 150 270 150'/%3E%3Cpolygon fill='%23444' points='360 0 270 150 450 150'/%3E%3Cpolygon fill='%23FFF' points='540 0 450 150 630 150'/%3E%3Cpolygon points='900 0 810 150 990 150'/%3E%3Cpolygon fill='%23222' points='0 300 -90 450 90 450'/%3E%3Cpolygon fill='%23FFF' points='0 300 90 150 -90 150'/%3E%3Cpolygon fill='%23FFF' points='180 300 90 450 270 450'/%3E%3Cpolygon fill='%23666' points='180 300 270 150 90 150'/%3E%3Cpolygon fill='%23222' points='360 300 270 450 450 450'/%3E%3Cpolygon fill='%23FFF' points='360 300 450 150 270 150'/%3E%3Cpolygon fill='%23444' points='540 300 450 450 630 450'/%3E%3Cpolygon fill='%23222' points='540 300 630 150 450 150'/%3E%3Cpolygon fill='%23AAA' points='720 300 630 450 810 450'/%3E%3Cpolygon fill='%23666' points='720 300 810 150 630 150'/%3E%3Cpolygon fill='%23FFF' points='900 300 810 450 990 450'/%3E%3Cpolygon fill='%23999' points='900 300 990 150 810 150'/%3E%3Cpolygon points='0 600 -90 750 90 750'/%3E%3Cpolygon fill='%23666' points='0 600 90 450 -90 450'/%3E%3Cpolygon fill='%23AAA' points='180 600 90 750 270 750'/%3E%3Cpolygon fill='%23444' points='180 600 270 450 90 450'/%3E%3Cpolygon fill='%23444' points='360 600 270 750 450 750'/%3E%3Cpolygon fill='%23999' points='360 600 450 450 270 450'/%3E%3Cpolygon fill='%23666' points='540 600 630 450 450 450'/%3E%3Cpolygon fill='%23222' points='720 600 630 750 810 750'/%3E%3Cpolygon fill='%23FFF' points='900 600 810 750 990 750'/%3E%3Cpolygon fill='%23222' points='900 600 990 450 810 450'/%3E%3Cpolygon fill='%23DDD' points='0 900 90 750 -90 750'/%3E%3Cpolygon fill='%23444' points='180 900 270 750 90 750'/%3E%3Cpolygon fill='%23FFF' points='360 900 450 750 270 750'/%3E%3Cpolygon fill='%23AAA' points='540 900 630 750 450 750'/%3E%3Cpolygon fill='%23FFF' points='720 900 810 750 630 750'/%3E%3Cpolygon fill='%23222' points='900 900 990 750 810 750'/%3E%3Cpolygon fill='%23222' points='1080 300 990 450 1170 450'/%3E%3Cpolygon fill='%23FFF' points='1080 300 1170 150 990 150'/%3E%3Cpolygon points='1080 600 990 750 1170 750'/%3E%3Cpolygon fill='%23666' points='1080 600 1170 450 990 450'/%3E%3Cpolygon fill='%23DDD' points='1080 900 1170 750 990 750'/%3E%3C/g%3E%3C/pattern%3E%3C/defs%3E%3Crect x='0' y='0' fill='url(%23a)' width='100%25' height='100%25'/%3E%3Crect x='0' y='0' fill='url(%23b)' width='100%25' height='100%25'/%3E%3C/svg%3E");
+  background-attachment: fixed;
+  background-size: cover; }
+
+h2 {
+  font-size: 2.0rem;
+  display: flex;
+  margin-bottom: 60px; }
+  h2 img.img_icon {
+    width: 40px;
+    margin: auto 20px auto 0;
+    vertical-align: baseline; }
+  h2 img.img_title {
+    width: 250px;
+    /*		border-bottom: 1px solid #a0a0a0;
+        padding-bottom: 10px;	*/ }
+
+span {
+  display: inline-block; }
+
+img {
+  max-width: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visiblity: hidden; }
+
+li {
+  list-style: none; }
+
+button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  padding: 0;
+  appearance: none; }
+
+button.btnRed {
+  background: #E74C3D;
+  color: #fff;
+  text-align: center;
+  display: inline-block;
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px; }
+  button.btnRed.btn_type_login {
+    width: 50%;
+    margin: 30px auto 0;
+    display: block; }
+
+::placeholder {
+  color: #B7B7B7; }
+
+header {
+  position: fixed;
+  width: 100%;
+  height: 90px;
+  z-index: 9999;
+  top: 0;
+  left: 0;
+  background: #212121;
+  display: flex;
+  padding: 20px; }
+  header .logo {
+    width: 200px;
+    display: flex;
+    align-items: center; }
+  header .sideBadge {
+    width: 75px;
+    display: flex;
+    align-items: center;
+    margin-left: 15px; }
+  header ul.global_menu {
+    width: 60%;
+    display: flex;
+    justify-content: flex-end;
+    margin-left: auto;
+    margin-right: 50px; }
+    header ul.global_menu li {
+      margin-right: 40px; }
+      header ul.global_menu li img {
+        width: 60px; }
+
+main {
+  margin: 130px auto 90px;
+  /*	background: #E0E2DB; 
+  	background-image: url("../img/bg_patterns.svg"); 
+  	background-size: 1280px auto;*/ }
+  main.no_margins {
+    margin-top: 0px;
+    padding-top: 70px; }
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 40px 75px;
+  box-shadow: 0px 2px 4px #c1c1c1; }
+
+.plc_delBtn {
+  width: 30px;
+  height: 30px;
+  background: brown;
+  position: absolute;
+  top: -30px;
+  right: 10px;
+  cursor: pointer;
+  opacity: 0; }
+  .plc_delBtn.visible {
+    animation: up-position .3s ease forwards; }
+  .plc_delBtn:active {
+    top: -25px; }
+  .plc_delBtn.plc_delBtn_caseindex {
+    top: 10px;
+    z-index: 50; }
+
+footer {
+  height: 240px;
+  background: #212121; }
+  footer .ft_container {
+    max-width: 1280px;
+    height: 100%;
+    margin: 0 auto;
+    padding: 40px 0;
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    color: #fff; }
+    footer .ft_container > div {
+      width: 24%;
+      display: flex;
+      flex-direction: column; }
+    footer .ft_container .ft_box:first-child {
+      width: 16%; }
+    footer .ft_container img.logo {
+      margin-left: auto; }
+    footer .ft_container p {
+      margin-left: auto; }
+    footer .ft_container ul li {
+      font-size: 13px; }
+      footer .ft_container ul li.menu_title {
+        font-size: 16px;
+        border-bottom: 1px solid #7b7b7b;
+        margin-bottom: 15px;
+        padding: 5px 0; }
+      footer .ft_container ul li.menu_detail {
+        margin: 5px 0 0 20px;
+        position: relative; }
+        footer .ft_container ul li.menu_detail::before {
+          content: '';
+          position: absolute;
+          top: 5px;
+          left: -25px;
+          width: 10px;
+          height: 10px;
+          border-top: 2px solid #e74c3d;
+          border-left: 2px solid transparent;
+          border-bottom: 2px solid transparent;
+          border-right: 2px solid #e74c3d;
+          transform: rotate(45deg); }
+      footer .ft_container ul li a {
+        color: #fff; }
+  footer .copyright {
+    text-align: center;
+    font-weight: 500;
+    background: #000;
+    padding: 10px 0; }
+
+/*----------------------------------------------------------
+各管理画面共通
+-----------------------------------------------------------*/
+.desc_page {
+  padding: 20px;
+  font-size: 13px;
+  border: 1px solid #8f8f8f;
+  margin-bottom: 30px; }
+  .desc_page p {
+    margin: 0; }
+  .desc_page .add_info {
+    margin-top: 15px; }
+    .desc_page .add_info .add_info_title {
+      color: #B80000;
+      margin-bottom: 10px; }
+    .desc_page .add_info .add_info_txt {
+      font-size: 12px;
+      margin-left: 10px; }
+
+/*----------------------------------------------------------
+ログイン画面
+-----------------------------------------------------------*/
+.login_container {
+  position: relative;
+  width: 430px;
+  margin: 0 auto;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 2.5rem 2rem -2rem #333;
+  font-size: 13.33px;
+  background: #fff;
+  /*	 -webkit-filter: drop-shadow(0px 3px 10px rgba(0,0,0,.8));
+      filter: drop-shadow(0px 0px 10px rgba(0,0,0,.8));*/ }
+
+.login_bk_area {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0 auto;
+  background-image: url("../img/bk_login_image.jpeg");
+  background-size: cover;
+  background-position: center;
+  opacity: 0.1; }
+
+.login_area {
+  padding: 30px;
+  position: relative; }
+  .login_area h2 img {
+    width: auto;
+    margin: 0 50px; }
+  .login_area .input_box {
+    /*margin: 0 auto 50px; */
+    /*min-height: 190px;*/ }
+    .login_area .input_box input[type="text"], .login_area .input_box input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #d2d2d2; }
+      .login_area .input_box input[type="text"]:focus, .login_area .input_box input[type="password"]:focus {
+        outline: inherit;
+        outline: 2px solid #E74C3D;
+        outline-offset: -2px; }
+    .login_area .input_box input[type="password"] {
+      font-family: Verdana, sans-serif; }
+    .login_area .input_box span {
+      font-size: 11px;
+      color: #FF0004;
+      display: block; }
+  .login_area .auto_auth {
+    margin-top: 15px; }
+  .login_area input[type="checkbox"] {
+    display: none; }
+    .login_area input[type="checkbox"] + label {
+      display: block;
+      position: relative;
+      padding-left: 35px;
+      margin-bottom: 20px;
+      font: 14px/20px 'Open Sans', Arial, sans-serif;
+      cursor: pointer;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none; }
+      .login_area input[type="checkbox"] + label::before {
+        content: '';
+        display: block;
+        width: 20px;
+        height: 20px;
+        border: 1px solid #565656;
+        position: absolute;
+        left: 0;
+        top: 0;
+        opacity: .6;
+        -webkit-transition: all .12s, border-color .08s;
+        transition: all .12s, border-color .08s; }
+    .login_area input[type="checkbox"]:checked + label::before {
+      width: 10px;
+      top: -5px;
+      left: 5px;
+      border-radius: 0;
+      opacity: 1;
+      border-top-color: transparent;
+      border-left-color: transparent;
+      border-bottom-color: #E74C3D;
+      border-right-color: #E74C3D;
+      -webkit-transform: rotate(45deg);
+      transform: rotate(45deg); }
+  .login_area a.reg_link {
+    width: 100%;
+    display: block;
+    margin-top: 10px;
+    text-align: center;
+    color: inherit;
+    text-decoration: underline; }
+
+/*----------------------------------------------------------
+ローディング画面　
+-----------------------------------------------------------*/
+.dark_filter {
+  display: none;
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  background: rgba(71, 71, 71, 0.8); }
+
+.loader {
+  display: none;
+  margin: 50vh auto;
+  font-size: 18px;
+  width: 1em;
+  height: 1em;
+  border-radius: 50%;
+  position: relative;
+  text-indent: -9999em;
+  -webkit-animation: loading 1.1s infinite ease;
+  animation: loading 1.1s infinite ease;
+  -webkit-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  transform: translateZ(0); }
+
+@keyframes loading {
+  0%,
+  100% {
+    box-shadow: 0em -2.6em 0em 0em #4C4C4C, 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2), 2.5em 0em 0 0em rgba(255, 255, 255, 0.2), 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.2), 0em 2.5em 0 0em rgba(255, 255, 255, 0.2), -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.2), -2.6em 0em 0 0em rgba(255, 255, 255, 0.5), -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.7); }
+  12.5% {
+    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.7), 1.8em -1.8em 0 0em #4C4C4C, 2.5em 0em 0 0em rgba(255, 255, 255, 0.2), 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.2), 0em 2.5em 0 0em rgba(255, 255, 255, 0.2), -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.2), -2.6em 0em 0 0em rgba(255, 255, 255, 0.2), -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.5); }
+  25% {
+    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.5), 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.7), 2.5em 0em 0 0em #4C4C4C, 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.2), 0em 2.5em 0 0em rgba(255, 255, 255, 0.2), -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.2), -2.6em 0em 0 0em rgba(255, 255, 255, 0.2), -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2); }
+  37.5% {
+    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.2), 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.5), 2.5em 0em 0 0em rgba(255, 255, 255, 0.7), 1.75em 1.75em 0 0em #4C4C4C, 0em 2.5em 0 0em rgba(255, 255, 255, 0.2), -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.2), -2.6em 0em 0 0em rgba(255, 255, 255, 0.2), -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2); }
+  50% {
+    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.2), 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2), 2.5em 0em 0 0em rgba(255, 255, 255, 0.5), 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.7), 0em 2.5em 0 0em #4C4C4C, -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.2), -2.6em 0em 0 0em rgba(255, 255, 255, 0.2), -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2); }
+  62.5% {
+    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.2), 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2), 2.5em 0em 0 0em rgba(255, 255, 255, 0.2), 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.5), 0em 2.5em 0 0em rgba(255, 255, 255, 0.7), -1.8em 1.8em 0 0em #4C4C4C, -2.6em 0em 0 0em rgba(255, 255, 255, 0.2), -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2); }
+  75% {
+    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.2), 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2), 2.5em 0em 0 0em rgba(255, 255, 255, 0.2), 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.2), 0em 2.5em 0 0em rgba(255, 255, 255, 0.5), -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.7), -2.6em 0em 0 0em #4C4C4C, -1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2); }
+  87.5% {
+    box-shadow: 0em -2.6em 0em 0em rgba(255, 255, 255, 0.2), 1.8em -1.8em 0 0em rgba(255, 255, 255, 0.2), 2.5em 0em 0 0em rgba(255, 255, 255, 0.2), 1.75em 1.75em 0 0em rgba(255, 255, 255, 0.2), 0em 2.5em 0 0em rgba(255, 255, 255, 0.2), -1.8em 1.8em 0 0em rgba(255, 255, 255, 0.5), -2.6em 0em 0 0em rgba(255, 255, 255, 0.7), -1.8em -1.8em 0 0em #4C4C4C; } }
+@keyframes up-position {
+  0% {
+    opacity: 0;
+    transform: translateY(30px); }
+  80% {
+    opacity: 0.5; }
+  100% {
+    opacity: 1;
+    transform: translateY(0); } }
