@@ -464,6 +464,9 @@
         },
       },
       computed: {
+				//元となる製品データ(JSONファイルから読み込み)
+				
+				//表示する製品
         view_products() {
           let products = Array.from(this.products);
           let filtered = [];
@@ -492,6 +495,7 @@
 
           return result;
         },
+				//モーダル内のレイアウト調整用
         balanceNum() {
           let btnNum = this.modal_weights.length;
           let diff = btnNum % 4;
@@ -501,6 +505,7 @@
             return diff;
           }
         },
+				//小計
         subtotal_price() {
           let result = 0;
           this.cart.map(v => {
@@ -510,6 +515,7 @@
           });
           return result;
         },
+				//在庫
 				view_stocks(){
 					let stocks = Array.from(this.stockArr);
 					let weights = stocks.map(v=>{return v.weight});
