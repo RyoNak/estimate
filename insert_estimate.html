@@ -410,10 +410,10 @@
       el: '#app',
       data() {
         return {
-          action: 'insert',
-          products: [],
-          searchWord: '',
-          honor: '御中',
+          action: 'insert',//insert:新規追加、update:更新、copy:複製
+          products: [],//製品データ
+          searchWord: '',//検索キーワード
+          honor: '御中',//敬称
           is_modal_loading: false,
           is_modal: false,
           is_modal2: false,
@@ -458,6 +458,7 @@
       },
       watch: {
         mode() {
+					//モード遷移時、掛け率を1に戻し、画面上部までスクロールする
           this.ratio = 1;
           this.scrollTopPosition();
         },

@@ -49,9 +49,7 @@
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 <script src="./component/db_properties.json.js"></script>
-<script>
-	const jsonData = JSON.parse(JSON.stringify(window.ESTIMATE));
-	
+<script>	
 	let app = new Vue({
 		el: '#app',
 		data(){
@@ -62,20 +60,18 @@
 			}
 		},
 		computed:{
+			//表示する見積書
 			view_estimates(){
 				let filtered = [];
 				
 				if(this.estimates.length > 0){
-          let nameReg = new RegExp(this.searchWord);
-          let idReg = new RegExp(this.searchWord);
+          const nameReg = new RegExp(this.searchWord);
+          const idReg = new RegExp(this.searchWord);
 
 
           filtered = this.estimates.filter(v=>{
             let is_view = false;
-            if(v.name.match(nameReg)){
-              is_view = true;
-            }
-            else if(String(v.id).match(idReg)){
+            if(v.name.match(nameReg) || String(v.id).match(idReg)){
               is_view = true;
             }
             return is_view;
@@ -83,25 +79,29 @@
 				}
 				return filtered;
 			},
+			//元となる見積書データ（JSONファイルから読み込み）
+			jsonData(){
+				return JSON.parse(JSON.stringify(window.ESTIMATE));
+			},
 		},
 		created(){
 			this.getEstimate();
 		},
 		methods:{
 			getEstimate(){
-				let self = this;
+				const self = this;
 				let result = [];
 				
-        result = self.shapeArray(jsonData['estimate']);
+        result = self.shapeArray(self.jsonData['estimate']);
         result = result.sort((a,b)=>{
           return b.reg_date - a.reg_date;
         });
         self.estimates = result;
 			},
-      // axiosによって取得したデータを整形する
+      // 引数の配列を整形する
       shapeArray(arr){
         let obj_arr = [];
-        //整形
+
         for(var i in arr){
           let obj = {};
           //キー値が数字でないもののみを抽出
